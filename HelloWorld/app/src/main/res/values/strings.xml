@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">YoYo World!!!!</string>
     <string name="string1">I am string 1!</string>
+    <string name="TOUCH_ME">TOUCH ME</string>
+    <string name="Hello">Hello...??</string>
+    <string name="EnterName">Enter Name</string>
 </resources>
