@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Blank</string>
+    <string name="action_settings">Settings</string>
+    <string-array name="things_list">
+        <item>Thnig 1</item>
+        <item>Thing 2</item>
+        <item>Thing 3</item>
+    </string-array>
+    <string name="title_activity_thing_detail">ThingDetailActivity</string>
+</resources>
