@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">DGarcia Project</string>
+
+    <!-- fragment_main_activity -->
+    <string name="TV_reviewsHeader">REVIEWS</string>
+    <string-array name="reviews_list">
+        <item>English Breakfast Tea</item>
+        <item>Asahi Beer</item>
+        <item>Winchells Chorizo Bagel</item>
+        <item>Some Review 1</item>
+        <item>Some Review 2</item>
+        <item>Some Review 3</item>
+        <item>Some Review 4</item>
+        <item>Some Review 5</item>
+        <item>Some Review 6</item>
+        <item>Some Review 7</item>
+        <item>Some Review 8</item>
+        <item>Some Review 9</item>
+        <item>Some Review 10</item>
+    </string-array>
+
+
+
+    <!-- REVIEW DETAIL FRAGMENT -->
+    <string name="review_detail_header">REVIEW</string>
+    <string name="review_detail_paragraph">Some review...</string>
+</resources>
