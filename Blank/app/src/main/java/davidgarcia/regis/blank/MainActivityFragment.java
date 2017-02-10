@@ -66,6 +66,9 @@ public class MainActivityFragment extends Fragment {
 
             }
         });
+
+        
+
         // return the rootView from onCreateView
         return rootView;
     }

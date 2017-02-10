@@ -7,4 +7,11 @@
         <item>Thing 3</item>
     </string-array>
     <string name="title_activity_thing_detail">ThingDetailActivity</string>
+
+    <!-- menu_test items-->
+    <string name="title_item_detail">Item Detail</string>
+    <string name="firstaction">first</string>
+    <string name="secondaction">second</string>
+
+
 </resources>
