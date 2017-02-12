@@ -2,11 +2,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
-    <item
+	
+    <!-- add setting tabs on action -->
+	
+	<!-- dont need this part??
+	<item
         android:id="@+id/action_settings"
         android:title="SettingsTest"
         android:orderInCategory="100"
-        app:showAsAction="never"/>
+        app:showAsAction="never"/>                -->
+		
     <item
         android:id="@+id/first"
         android:title="@string/firstaction"

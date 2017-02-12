@@ -54,7 +54,7 @@ public class mainActivityFragment extends Fragment {
                 String item = (String) reviewListView.getItemAtPosition(i); // int i is the position
 
                 //Toast when clicked
-               Toast.makeText(view.getContext(), "#"+i+" Clicked:"+item, Toast.LENGTH_SHORT).show();
+              // Toast.makeText(view.getContext(), "#"+i+" Clicked:"+item, Toast.LENGTH_SHORT).show();
 
 
                 // Intent detail

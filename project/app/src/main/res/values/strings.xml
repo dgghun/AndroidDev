@@ -19,9 +19,12 @@
         <item>Some Review 10</item>
     </string-array>
 
+    <!--my actionbar strings-->
+    <string name="action_1">Action_1</string>
+    <string name="action_2">Action_2</string>
 
 
     <!-- REVIEW DETAIL FRAGMENT -->
     <string name="review_detail_header">REVIEW</string>
-    <string name="review_detail_paragraph">Some review...</string>
+    <string name="review_detail_paragraph">Some review about this item...</string>
 </resources>
