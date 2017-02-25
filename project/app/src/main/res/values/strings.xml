@@ -23,6 +23,17 @@
     <string name="action_1">Action_1</string>
     <string name="action_2">Action_2</string>
 
+    <!-- nav drawer strings-->
+    <string-array name="navDrawerItems">
+        <item>NavD One</item>
+        <item>NavD Two</item>
+    </string-array>
+
+    <!--nav drawer title-->
+    <string name="nav_drawer_title">NavDrawer Options</string>
+    <!--for nav drawer toggle button -->
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
 
     <!-- REVIEW DETAIL FRAGMENT -->
     <string name="review_detail_header">REVIEW</string>

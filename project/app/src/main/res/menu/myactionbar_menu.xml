@@ -11,6 +11,4 @@
         android:id="@+id/second"
         android:title="@string/action_2"
         app:showAsAction="ifRoom"/>
-
-
 </menu>
