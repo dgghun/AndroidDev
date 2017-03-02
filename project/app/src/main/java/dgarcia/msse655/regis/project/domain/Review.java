@@ -14,12 +14,14 @@ public class Review implements java.io.Serializable{
     private static final long serialVersionUID = 1L;    //serializable ID
     private String reviewTitle;
     private String reviewParagraph;
+    private int reviewId;
     private int reviewImageID;
 
     /**
      * Default constructor
      */
     public Review() {
+        reviewId = -1;
         reviewTitle = new String();
         reviewParagraph = new String();
         reviewImageID = R.drawable.default_image;  // default image ID
@@ -30,10 +32,19 @@ public class Review implements java.io.Serializable{
      * @param reviewTitle
      * @param reviewParagraph
      */
-    public Review(String reviewTitle, String reviewParagraph) {
+    public Review(int reviewID, String reviewTitle, String reviewParagraph) {
+        this.reviewId = reviewID;
         this.reviewTitle = reviewTitle;
         this.reviewParagraph = reviewParagraph;
         this.reviewImageID = R.drawable.default_image; // add argument later ->> reviewImageID
+    }
+
+    public int getReviewId() {
+        return reviewId;
+    }
+
+    public void setReviewId(int reviewId) {
+        this.reviewId = reviewId;
     }
 
     public int getReviewImageID() {
@@ -58,6 +69,14 @@ public class Review implements java.io.Serializable{
 
     public void setReviewTitle(String reviewTitle) {
         this.reviewTitle = reviewTitle;
+    }
+
+    @Override
+    public String toString() {
+        return "Review{" +
+                "reviewId=" + reviewId +
+                ", reviewImageID=" + reviewImageID +
+                '}';
     }
 
     @Override
