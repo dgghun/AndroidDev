@@ -3,6 +3,7 @@ package dgarcia.msse655.regis.project.services;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -37,6 +38,7 @@ public class ReviewSvcSQLiteImpl extends SQLiteOpenHelper implements IReviewSvc{
     public void onCreate(SQLiteDatabase sqLiteDatabase){
         sqLiteDatabase.execSQL(createReviewsTable);
     }
+
 
     // Abstract method over ridden, used to update database schema
     @Override
@@ -114,6 +116,7 @@ public class ReviewSvcSQLiteImpl extends SQLiteOpenHelper implements IReviewSvc{
         int numberOfRowsUpdated = sqLiteDatabase.update(TABLE_1, values,"id = ?", new String[]{String.valueOf(review.getReviewId())});
         sqLiteDatabase.close();
 
+        //TODO-Implement an exception here.
         //check number of rows updated, if failed
         if (numberOfRowsUpdated < 1) return null;   //failed
         return review; // good
@@ -125,9 +128,16 @@ public class ReviewSvcSQLiteImpl extends SQLiteOpenHelper implements IReviewSvc{
         int rowsDeleted = sqLiteDatabase.delete(TABLE_1,"id = ?",new String[]{String.valueOf(review.getReviewId())});
         sqLiteDatabase.close();
 
+        //TODO-Implement an exception here
         // Check if deleted
         if(rowsDeleted == 0) return null; // failed
         return review;  // good
+    }
+
+    public int deleteAll(){
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+        sqLiteDatabase.delete(TABLE_1,null,null);
+        return (int) DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_1);
     }
 
 }// END OF ReviewSvcSWLiteImpl

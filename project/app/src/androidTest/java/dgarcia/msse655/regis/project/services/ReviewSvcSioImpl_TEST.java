@@ -27,7 +27,9 @@ public class ReviewSvcSioImpl_TEST extends ApplicationTestCase<Application> { //
         super(Application.class);
     }
 
-    public void testReviewObjects(){
+    //BLOCKED OUT. Used for serialization persistence scheme. Need to refactor to match Review class
+    // if you want to us this refactor to match Review Class
+    /*public void testReviewObjects(){
 
         review_1 = new Review(REVIEW_TITLE_1, REVIEW_PARAGRAPH_1);  //constructor with parameters
         review_2 = new Review();                                    //default constructor
@@ -82,5 +84,5 @@ public class ReviewSvcSioImpl_TEST extends ApplicationTestCase<Application> { //
 
         reviewSvcSio.deleteAll();   // checks delete all method
         assertEquals(reviewSvcSio.isEmpty(), true); // asserts all has been deleted
-    }
+    }*/
 }
