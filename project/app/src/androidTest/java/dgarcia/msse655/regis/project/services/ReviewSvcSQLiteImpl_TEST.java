@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.xml.datatype.Duration;
 
+import dalvik.annotation.TestTargetClass;
 import dgarcia.msse655.regis.project.domain.Review;
 
 // Using JUnit 4 scheme
@@ -42,29 +43,34 @@ public class ReviewSvcSQLiteImpl_TEST extends ApplicationTestCase<Application> {
     public void testReadWriteReviewObject() {
         //Pass context from test
         ReviewSvcSQLiteImpl reviewSvcSQLite = new ReviewSvcSQLiteImpl(this.getContext());
-        //String time = Long.toString(System.currentTimeMillis()/1000);  // time stamp for Review object
-
-
         Review review = new Review();
 
+        // Create 3 reviews with a time stamp as the title, store in db
         for(int i = 0; i < 3; i++){
             review.setReviewTitle("TIME: "+ getDateTime());
             reviewSvcSQLite.create(review);
-            SystemClock.sleep(1000);
+            SystemClock.sleep(1000);    //wait for seconds time stamp
         }
 
+        List<Review> reviewList = reviewSvcSQLite.retrieveAllReviews(); // get all reviews in db
 
-        List<Review> reviewList = reviewSvcSQLite.retrieveAllReviews();
-
-        int rows = 0;
+        int rows = 0; //count how many rows there are
         for(Review r : reviewList){
             Log.e("TEST", "WriteAndReadReviewObject ReviewID:" + r.getReviewId() + " " + r.getReviewTitle());
             rows++;
         }
         Log.e("TEST", "WriteAndReadReviewObject Row Count Before Delete All: " + rows);
 
-        rows = reviewSvcSQLite.deleteAll();
+        rows = reviewSvcSQLite.deleteAll(); // delete all rows (Reviews)
         Log.e("TEST", "WriteAndReadReviewObject - Deleted all rows. Current rows: " + rows);
+    }
+
+    //TODO-Need to finish this
+    @Test
+    public void testUpdateAndDelete(){
+        ReviewSvcSQLiteImpl reviewSvcSQLite = new ReviewSvcSQLiteImpl(this.getContext());
+
+
     }
 
 
