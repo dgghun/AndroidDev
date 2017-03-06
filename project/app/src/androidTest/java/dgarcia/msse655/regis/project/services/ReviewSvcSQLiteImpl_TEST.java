@@ -65,10 +65,32 @@ public class ReviewSvcSQLiteImpl_TEST extends ApplicationTestCase<Application> {
         Log.e("TEST", "WriteAndReadReviewObject - Deleted all rows. Current rows: " + rows);
     }
 
-    //TODO-Need to finish this
+
     @Test
     public void testUpdateAndDelete(){
         ReviewSvcSQLiteImpl reviewSvcSQLite = new ReviewSvcSQLiteImpl(this.getContext());
+        Review review = new Review();
+        int rows = 0;
+
+        review.setReviewTitle("1st Title");          //set title
+        review = reviewSvcSQLite.create(review);    //save to database
+
+        //check if created successfully
+        if(review != null) Log.e("TEST", "testUpdateAndDelete - ReviewID:" + review.getReviewId() + " Title: " + review.getReviewTitle() + " - created successful");
+        else Log.e("TEST", "testUpdateAndDelete - " + review.getReviewTitle() + " created unsuccessfully");
+
+        //update title
+        review.setReviewTitle("Updated Title");
+        if(reviewSvcSQLite.update(review) != null) Log.e("TEST", "testUpdateAndDelete - Updated title to: " + review.getReviewTitle());
+        else Log.e("TEST", "testUpdateAndDelete - DB update unsuccessful");
+
+        //delete Review
+        if(reviewSvcSQLite.delete(review) != null) Log.e("TEST", "testUpdateAndDelete - Review deleted. NumOfRows: " + reviewSvcSQLite.getNumOfRows());
+        else {
+            Log.e("TEST", "testUpdateAndDelete - unable to delete review:" + review.getReviewTitle());
+            rows = reviewSvcSQLite.deleteAll();
+            Log.e("TEST", "WriteAndReadReviewObject - Deleted all rows. Current rows: " + rows);
+        }
 
 
     }

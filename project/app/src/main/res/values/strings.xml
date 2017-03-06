@@ -3,6 +3,7 @@
 
     <!-- fragment_main_activity -->
     <string name="TV_reviewsHeader">REVIEWS</string>
+    <!-- NOT USED ANYMORE. USING SQLite DB-->
     <string-array name="reviews_list">
         <item>English Breakfast Tea</item>
         <item>Asahi Beer</item>
@@ -38,4 +39,7 @@
     <!-- REVIEW DETAIL FRAGMENT -->
     <string name="review_detail_header">REVIEW</string>
     <string name="review_detail_paragraph">Some review about this item...</string>
+
+    <!--BUTTONS-->
+    <string name="Button_add_review">ADD REVIEW</string>
 </resources>

@@ -16,15 +16,25 @@
         android:layout_alignParentEnd="true"
         android:paddingTop="10dp"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"/>
+        android:layout_alignParentStart="true"
+        android:id="@+id/textView3" />
+
     <ListView
-        android:layout_height="wrap_content"
+        android:id="@+id/ListView_list_of_reviews"
         android:layout_width="wrap_content"
-        android:id="@+id/list_of_reviews"
-        android:layout_alignParentTop="true"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button_addReview"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:paddingTop="40dp">
-    </ListView>
+        android:layout_below="@+id/textView3"></ListView>
+
+    <Button
+        android:id="@+id/button_addReview"
+        style="@android:style/Widget.Button"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="@string/Button_add_review"
+        />
 
 </RelativeLayout>

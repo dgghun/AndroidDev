@@ -6,12 +6,17 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.icu.text.DateFormat;
+import android.icu.text.SimpleDateFormat;
+import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import dgarcia.msse655.regis.project.domain.Review;
+
+import static android.R.attr.format;
 
 /**
  * Created by David_Garcia on 3/1/2017.
@@ -23,10 +28,14 @@ public class ReviewSvcSQLiteImpl extends SQLiteOpenHelper implements IReviewSvc{
     private static final String DBNAME  = "reviews.db";
     private static final int DBVERSION = 1;
 
-    private final String TABLE_1 = "reviews";
+    private final String TABLE_REVIEWS = "reviews";
+    private final String DATE = "date";
+    private final String TITLE = "reviewTitle";
+    private final String PARAGRAPH = "reviewParagraph";
+    private final String IMAGE_ID = "reviewImageID";
 
-    private String createReviewsTable = "create table " + TABLE_1 +
-            " (id integer primary key autoincrement, reviewTitle text not null, reviewParagraph text, reviewImageID integer )";
+    private String createReviewsTable = "create table " + TABLE_REVIEWS +
+            " (id integer primary key autoincrement, "+DATE+" text not null, "+TITLE+" text not null, "+PARAGRAPH+" text, "+IMAGE_ID+" integer )";
 
     //Constructor SQLiteOpenHelper
     public ReviewSvcSQLiteImpl(Context context){
@@ -43,9 +52,10 @@ public class ReviewSvcSQLiteImpl extends SQLiteOpenHelper implements IReviewSvc{
     // Abstract method over ridden, used to update database schema
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1){
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_1);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_REVIEWS);
         onCreate(sqLiteDatabase);
     }
+
 
 
     // *** CRUD ***********************************
@@ -56,16 +66,19 @@ public class ReviewSvcSQLiteImpl extends SQLiteOpenHelper implements IReviewSvc{
         ContentValues values = new ContentValues();     //Create object to hold ro values that go in table
 
         //Add values for row
-        values.put("reviewTitle", review.getReviewTitle());
-        values.put("reviewParagraph", review.getReviewParagraph());
-        values.put("reviewImageID", review.getReviewImageID());
+        values.put(DATE, review.getReviewDate());
+        values.put(TITLE, review.getReviewTitle());
+        values.put(PARAGRAPH, review.getReviewParagraph());
+        values.put(IMAGE_ID, review.getReviewImageID());
+        //values.put("id", System.currentTimeMillis());
 
         //Insert row into db. Returns row ID of the new row,
         //or -1 if insert failed. Good idea to check returned value.
-        long rowIdOfInsertedRecord = sqLiteDatabase.insert(TABLE_1, null, values);
+        long rowIdOfInsertedRecord = sqLiteDatabase.insert(TABLE_REVIEWS, null, values);
         sqLiteDatabase.close(); //close db
 
         if (rowIdOfInsertedRecord == -1) return null;   // if insert failed
+        else review.setReviewId(rowIdOfInsertedRecord);
         return review;  // if insert good
     }
 
@@ -73,9 +86,9 @@ public class ReviewSvcSQLiteImpl extends SQLiteOpenHelper implements IReviewSvc{
     public List<Review> retrieveAllReviews() {
         List<Review> reviews = new ArrayList<>();
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
-        Cursor cursor = sqLiteDatabase.query(TABLE_1, //Table name
-                //Column      0     1               2                   3
-                new String[]{"id", "reviewTitle", "reviewParagraph", "reviewImageID"},
+        Cursor cursor = sqLiteDatabase.query(TABLE_REVIEWS, //Table name
+                //Column      0     1      2        3         4
+                new String[]{"id", DATE, TITLE, PARAGRAPH, IMAGE_ID},
                 null, null, null, null, null);
 
         cursor.moveToFirst();
@@ -96,9 +109,10 @@ public class ReviewSvcSQLiteImpl extends SQLiteOpenHelper implements IReviewSvc{
         //On getInt & getString the num passed in is index of column
         //name used in query. See string array in retrieveAllReviews()
         review.setReviewId(cursor.getInt(0));
-        review.setReviewTitle(cursor.getString(1));
-        review.setReviewParagraph(cursor.getString(2));
-        review.setReviewImageID(cursor.getInt(3));
+        review.setReviewDate(cursor.getString(1));
+        review.setReviewTitle(cursor.getString(2));
+        review.setReviewParagraph(cursor.getString(3));
+        review.setReviewImageID(cursor.getInt(4));
         return review;
     }
 
@@ -108,15 +122,16 @@ public class ReviewSvcSQLiteImpl extends SQLiteOpenHelper implements IReviewSvc{
         ContentValues values = new ContentValues();
 
         //Add values for row to update
-        values.put("reviewTitle", review.getReviewTitle());
-        values.put("reviewParagraph", review.getReviewParagraph());
-        values.put("reviewImageID", review.getReviewImageID());
+        values.put(DATE, review.getReviewDate());
+        values.put(TITLE, review.getReviewTitle());
+        values.put(PARAGRAPH, review.getReviewParagraph());
+        values.put(IMAGE_ID, review.getReviewImageID());
 
         // Tell the update how to find the record to update by Id
-        int numberOfRowsUpdated = sqLiteDatabase.update(TABLE_1, values,"id = ?", new String[]{String.valueOf(review.getReviewId())});
+        int numberOfRowsUpdated = sqLiteDatabase.update(TABLE_REVIEWS, values,"id = ?", new String[]{String.valueOf(review.getReviewId())});
         sqLiteDatabase.close();
 
-        //TODO-Implement an exception here.
+
         //check number of rows updated, if failed
         if (numberOfRowsUpdated < 1) return null;   //failed
         return review; // good
@@ -125,7 +140,7 @@ public class ReviewSvcSQLiteImpl extends SQLiteOpenHelper implements IReviewSvc{
     @Override
     public Review delete(Review review) {
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
-        int rowsDeleted = sqLiteDatabase.delete(TABLE_1,"id = ?",new String[]{String.valueOf(review.getReviewId())});
+        int rowsDeleted = sqLiteDatabase.delete(TABLE_REVIEWS,"id = ?",new String[]{String.valueOf(review.getReviewId())});
         sqLiteDatabase.close();
 
         //TODO-Implement an exception here
@@ -136,8 +151,17 @@ public class ReviewSvcSQLiteImpl extends SQLiteOpenHelper implements IReviewSvc{
 
     public int deleteAll(){
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
-        sqLiteDatabase.delete(TABLE_1,null,null);
-        return (int) DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_1);
+
+        try{
+            sqLiteDatabase.delete(TABLE_REVIEWS,null,null);
+        }catch (Exception e){
+            Log.e("deleteAll()",e.getMessage());
+        }
+        return (int) DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_REVIEWS);
     }
 
+    public int getNumOfRows(){
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+        return (int) DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_REVIEWS);
+    }
 }// END OF ReviewSvcSWLiteImpl
