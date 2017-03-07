@@ -78,7 +78,7 @@ public class ReviewSvcSQLiteImpl extends SQLiteOpenHelper implements IReviewSvc{
         sqLiteDatabase.close(); //close db
 
         if (rowIdOfInsertedRecord == -1) return null;   // if insert failed
-        else review.setReviewId(rowIdOfInsertedRecord);
+        else review.setReviewId(rowIdOfInsertedRecord); // else, set key ID and return it
         return review;  // if insert good
     }
 

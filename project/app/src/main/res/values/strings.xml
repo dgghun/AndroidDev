@@ -38,8 +38,10 @@
 
     <!-- REVIEW DETAIL FRAGMENT -->
     <string name="review_detail_header">REVIEW</string>
-    <string name="review_detail_paragraph">Some review about this item...</string>
+    <string name="review_detail_paragraph">ENTER REVIEW HERE</string>
+    <string name="review_title">ENTER REVIEW TITLE</string>
 
     <!--BUTTONS-->
     <string name="Button_add_review">ADD REVIEW</string>
+    <string name="Button_save_review">SAVE</string>
 </resources>

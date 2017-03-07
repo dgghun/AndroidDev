@@ -26,7 +26,7 @@
         android:layout_above="@+id/button_addReview"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/textView3"></ListView>
+        android:layout_below="@+id/textView3"/>
 
     <Button
         android:id="@+id/button_addReview"

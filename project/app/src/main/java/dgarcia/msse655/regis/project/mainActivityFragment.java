@@ -35,7 +35,11 @@ public class mainActivityFragment extends Fragment{
         // Required empty public constructor
     }
 
-
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        reviewsArrayAdapter.notifyDataSetChanged();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,62 +48,49 @@ public class mainActivityFragment extends Fragment{
         View rootView =  inflater.inflate(R.layout.fragment_main_activity, container, false);
         final ReviewSvcSQLiteImpl reviewSvcSQLite = new ReviewSvcSQLiteImpl(this.getContext()); // start SQLite database, final is used for onClick()
 
-        //TODO-finish add review stuff
-        //Review button onClickListener
+        //ADD Review button onClickListener
         Button addReviewButton = (Button) rootView.findViewById(R.id.button_addReview);
         addReviewButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 Review review = new Review();
-                review.setReviewTitle("New Review");
-                review = reviewSvcSQLite.create(review);
-                reviewsArrayAdapter.add(review);    // adds new review to ListView at runtime
-                Toast.makeText(view.getContext(), "Rows: " + reviewSvcSQLite.getNumOfRows(), LENGTH_SHORT).show();
+                Intent intent = new Intent(view.getContext(), reviewDetailActivity.class);
+                intent.putExtra("Review", review);  // put the string extra in, i.e. the "item" clicked name.
+                getActivity().startActivity(intent);
+                getActivity().finish(); // close this activity to be refreshed with new review
+
+
             }
         });
 
-
-
-
+        //TODO- Set list view with review name and date
         //Intialize reviewsList with strings.xml values
-        //reviewList = new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.reviews_list)));
         reviewList = new ArrayList<>(reviewSvcSQLite.retrieveAllReviews());
-
-
 
         //Initialize to the ListView from rootView, e.g. fragment_main_activity
         reviewListView = (ListView) rootView.findViewById(R.id.ListView_list_of_reviews);
 
         // Create adapter with type string (the type you are using).
         // Since we are using strings, ues simple_list_item_1 from android because it expects string types.
-//        ArrayAdapter<String> reviewsArrayAdapter = new ArrayAdapter<String>(rootView.getContext(), android.R.layout.simple_list_item_1, reviewList);
         reviewsArrayAdapter = new ArrayAdapter<>(rootView.getContext(), android.R.layout.simple_list_item_1, reviewList);
 
         //Set the adapter on the ListView
         reviewListView.setAdapter(reviewsArrayAdapter);
 
-        // Create onClick handler for the list
+        // Create onClick handler for the listView
         reviewListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                //get the item from the list, string type in this case
-               // String item = (String) reviewListView.getItemAtPosition(i); // int i is the position
+                //get the item from the list
                 Review review = (Review) reviewListView.getItemAtPosition(i); // int i is the position
-
-                //Toast when clicked
-              // Toast.makeText(view.getContext(), "#"+i+" Clicked:"+item, Toast.LENGTH_SHORT).show();
-
 
                 // Intent detail
                 Intent intent = new Intent(view.getContext(), reviewDetailActivity.class);
-//                intent.putExtra("item", item);  // put the string extra in, i.e. the "item" clicked name.
                 intent.putExtra("Review", review);  // put the string extra in, i.e. the "item" clicked name.
-                startActivity(intent);          // start activity
-
+                getActivity().startActivity(intent);
             }
         });
-
 
         // Inflate the layout for this fragment
         return rootView;
