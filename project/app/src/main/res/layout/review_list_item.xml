@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <!-- Example: http://www.learn-android.com/2011/11/22/lots-of-lists-custom-adapter/2/-->
+
+<!-- Custom Layout for Review ListView items-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <!-- Icon next to title/subtitle-->
+    <ImageView
+        android:id="@+id/review_icon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:scaleType="fitXY"
+        android:adjustViewBounds="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:padding="3dp"
+        />
+    <!-- Title of review-->
+    <TextView
+        android:id="@+id/review_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/review_icon"
+        android:layout_alignTop="@id/review_icon"
+        android:layout_margin="5dp"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        />
+    <TextView
+        android:id="@+id/review_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/review_title"
+        android:layout_below="@id/review_title"
+        android:textSize="12sp"
+        />
+
+</RelativeLayout>
