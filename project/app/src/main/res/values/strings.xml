@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DGarcia Project</string>
+    <string name="app_name">Call Me A Critic</string>
 
     <!-- fragment_main_activity -->
     <string name="TV_reviewsHeader">REVIEWS</string>

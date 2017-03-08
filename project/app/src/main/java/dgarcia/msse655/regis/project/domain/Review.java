@@ -2,7 +2,7 @@ package dgarcia.msse655.regis.project.domain;
 
 
 import java.util.Date;
-
+import java.text.DateFormat;
 import dgarcia.msse655.regis.project.R;
 
 /**
@@ -21,10 +21,11 @@ public class Review implements java.io.Serializable{
     private int reviewImageID;
 
 
-    public String getDateTime(){
+    private String getDateTime(){
         long mills = System.currentTimeMillis();
-        Date date = new Date(mills);
-        return date.toString();
+//        Date date = new Date(mills);
+//        return date.toString();
+        return DateFormat.getDateInstance(DateFormat.SHORT).format(mills);
     }
 
     /**
