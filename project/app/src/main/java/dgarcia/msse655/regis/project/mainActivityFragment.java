@@ -32,6 +32,7 @@ public class mainActivityFragment extends Fragment{
 
     private List<Review> reviewList = null;
     ReviewAdapter reviewsAdapter;
+    ReviewSvcSQLiteImpl reviewSvcSQLite;
     final int CODE_ADD_REVIEW = 1;
 
 
@@ -40,6 +41,7 @@ public class mainActivityFragment extends Fragment{
     }
 
 
+    //Add review to reviewsAdapter
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -48,12 +50,13 @@ public class mainActivityFragment extends Fragment{
             case CODE_ADD_REVIEW:
                 Review review = (Review)data.getSerializableExtra("Review");
                 if(review.getReviewId() != -1) reviewsAdapter.add(review);
+                else Toast.makeText(getContext(), "Error: Add to SQLite DB", Toast.LENGTH_SHORT).show();
                 break;
 
         }
     }// END OF onActivityResult()
 
-    //TODO-have menu HERE  delete reviews
+    //Handles Context Menu for long press
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -65,10 +68,24 @@ public class mainActivityFragment extends Fragment{
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-            super.onContextItemSelected(item);
+        super.onContextItemSelected(item);
         String message = item.getTitle().toString();
-        if(message.equals("Delete"))
-            Toast.makeText(getContext(), message + " coming soon!", LENGTH_SHORT).show();
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+
+
+        if(message.equals("Delete")){   //delete review from adapter & db
+
+            reviewList = reviewSvcSQLite.retrieveAllReviews();
+            Toast.makeText(getContext(), "DB count before: " + reviewList.size(), Toast.LENGTH_SHORT).show();
+
+            reviewSvcSQLite.delete(reviewsAdapter.getItem(info.position));
+            reviewsAdapter.remove(reviewsAdapter.getItem(info.position));
+
+            reviewList = reviewSvcSQLite.retrieveAllReviews();
+            Toast.makeText(getContext(), "DB count after: " + reviewList.size(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), message, LENGTH_SHORT).show();
+        }
         else if(message.equals("Share"))
             Toast.makeText(getContext(), message + " coming soon!", LENGTH_SHORT).show();
         else return false;
@@ -83,7 +100,7 @@ public class mainActivityFragment extends Fragment{
 
         // Store inflated view
         View rootView =  inflater.inflate(R.layout.fragment_main_activity, container, false);
-        final ReviewSvcSQLiteImpl reviewSvcSQLite = new ReviewSvcSQLiteImpl(this.getContext()); // start SQLite database, final is used for onClick()
+        reviewSvcSQLite = new ReviewSvcSQLiteImpl(this.getContext()); // start SQLite database, final is used for onClick()
 
         //TODO-TESTING ITEMS
         //reviewSvcSQLite.deleteAll();    //REMOVE THIS, DELETES DATABASE ON START!!!!!!!!!!!!!!!!!!!
