@@ -43,7 +43,7 @@ public final class ReviewAdapter extends ArrayAdapter<Review> {
         viewHolder.titleView.setText(review.getReviewTitle());
 
         //Setting subtitle view requires some formatting
-        final String subTitle = String.format("By %s on %s", review.getReviewTitle(), review.getReviewDate());
+        final String subTitle = String.format("%s - %s", review.getReviewDate(), review.getReviewParagraph());
         viewHolder.subTitleView.setText(subTitle);
 
         // Set the image icon

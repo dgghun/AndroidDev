@@ -1,6 +1,7 @@
 package dgarcia.msse655.regis.project;
 
 import android.content.Intent;
+import android.support.annotation.StringDef;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.os.Bundle;
@@ -14,6 +15,9 @@ import android.widget.Toast;
 import dgarcia.msse655.regis.project.domain.Review;
 import dgarcia.msse655.regis.project.services.ReviewSvcSQLiteImpl;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
+
 
 public class reviewDetailActivityFragment extends Fragment {
 
@@ -24,53 +28,86 @@ public class reviewDetailActivityFragment extends Fragment {
     //Set view
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+
+        final int NEW_REVIEW = -1;
+
         //TODO- Need to implement a check (if old review block edit/hide save button, else let edit EditTexts)
-
         final ReviewSvcSQLiteImpl reviewSvcSQLite = new ReviewSvcSQLiteImpl(this.getContext());
+        final View rootView = inflater.inflate(R.layout.fragment_review_detail, container, false); // Set view
+        Intent intent = getActivity().getIntent();  //Grab the intent.
+        Review review = (Review) intent.getSerializableExtra("Review"); //get Review Object from intent, Object = serializable
 
-        // Set view
-        final View rootView = inflater.inflate(R.layout.fragment_review_detail, container, false);
+        //Used to set editable or not
+        final EditText titleET = (EditText)rootView.findViewById(R.id.reviewTitle_editText);
+        final EditText paragraphET = (EditText)rootView.findViewById(R.id.reviewParagraph_edit_text);
+        final TextView reviewHeaderTV = (TextView) rootView.findViewById(R.id.reviewHeader_editText);
+        final Button saveReviewButton = (Button)rootView.findViewById(R.id.button_saveReview);
 
-        //Grab the intent.
-        Intent intent = getActivity().getIntent();
+        //If a new review must be from AddReview Button. Allow editing
+        if(review.getReviewId() == NEW_REVIEW){
 
-        // grab string extra called "item" from intent.
-        //String item = intent.getStringExtra("item");
-        final Review review = (Review) intent.getSerializableExtra("Review"); //get Review Object from intent
+            lockReviewView(false, titleET, paragraphET, saveReviewButton);  //unlock EditTxt/Button
 
-        //Find the TextView and set the text using string from intent
-        final TextView reviewTitleTV = (TextView) rootView.findViewById(R.id.textView_reviewTitle); // sets id to what
-        TextView reviewHeaderTV = (TextView) rootView.findViewById(R.id.reviewHeader_editText);
-        final EditText reviewParagraphET = (EditText) rootView.findViewById(R.id.reviewParagraph_edit_text);
 
-        //reviewTitleTV.setText(item);
-        //reviewHeaderTV.setText(review.getReviewDate());
-        reviewTitleTV.setText(review.getReviewTitle());
-        reviewParagraphET.setText(review.getReviewParagraph());
+        }
+        else{   // Isn't a new review, lock it up for viewing only
 
-        Button saveButton = (Button) rootView.findViewById(R.id.button_saveReview);
-        saveButton.setOnClickListener(new View.OnClickListener() {
+            lockReviewView(true, titleET, paragraphET, saveReviewButton);  //lock EditTxt/Button
+            reviewHeaderTV.setText(review.getReviewDate());
+            titleET.setText(review.getReviewTitle());
+            paragraphET.setText(review.getReviewParagraph());
+        }
+
+
+        saveReviewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String success = "";
+                String title = titleET.getText().toString().trim();
+                String paragraph = paragraphET.getText().toString().trim();
 
-                review.setReviewTitle(reviewTitleTV.getText().toString());
-                review.setReviewParagraph(reviewParagraphET.getText().toString());
+                // Check for empty title and paragraph
+                if(title.isEmpty()) Toast.makeText(getContext(), "Enter title!", Toast.LENGTH_SHORT).show();
+                else if(paragraph.isEmpty()) Toast.makeText(getContext(), "Enter paragraph!", Toast.LENGTH_SHORT).show();
+                else{
+                    //put review in db
+                    Review review = new Review();   // new review with date, -1 id
+                    review.setReviewTitle(title);
+                    review.setReviewParagraph(paragraph);
+                    review = reviewSvcSQLite.create(review);    // put in db and get Id
+                    if(review != null) success = "successfully!";
+                    else success = "unsuccessfully!";
 
-                if(reviewSvcSQLite.create(review) != null) success = "successfully!";
-                else success = "unsuccessfully!";
-                Toast.makeText(getContext(), "Saved " + success, Toast.LENGTH_SHORT).show();
-                Intent intent1 = new Intent(v.getContext(), MainActivity.class);
-                intent1.putExtra("Review", review);
-                getActivity().startActivity(intent1);
-                getActivity().finish();
+                    //Send back to parent activity
+                    // Example:http://stackoverflow.com/questions/14292398/how-to-pass-data-from-2nd-activity-to-1st-activity-when-pressed-back-android
+                    Intent intentToParent = new Intent();
+                    intentToParent.putExtra("Review", review);
 
+                    final int CODE_ADD_REVIEW = 1;
+                    getActivity().setResult(CODE_ADD_REVIEW, intentToParent); //For parent onActivityResult() method
 
-            }
+                    Toast.makeText(getContext(), "Saved " + success, Toast.LENGTH_SHORT).show();
+                    getActivity().finish();
+                }
+            }//END OF saveReviewButtonOnClick
         });
 
-        // return view
-        return rootView;
-    }
+
+        return rootView; // return view
+    }// END OF onCreate
+
+   private void lockReviewView(Boolean lock, EditText title, EditText paragraph, Button saveReviewButton){
+       if(lock){
+           title.setFocusable(false);
+           paragraph.setFocusable(false);
+           saveReviewButton.setVisibility(INVISIBLE);
+       }
+       else{
+           title.setFocusable(true);
+           paragraph.setFocusable(true);
+           saveReviewButton.setVisibility(VISIBLE);
+       }
+   }
+
 
 }

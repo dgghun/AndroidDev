@@ -4,7 +4,10 @@ import android.content.Intent;
 import android.icu.util.GregorianCalendar;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -27,20 +30,53 @@ import static android.widget.Toast.LENGTH_SHORT;
 
 public class mainActivityFragment extends Fragment{
 
-//    private List<String> reviewList = null;
     private List<Review> reviewList = null;
-    private ListView reviewListView = null;
-    public ArrayAdapter<Review> reviewsArrayAdapter;
+    ReviewAdapter reviewsAdapter;
+    final int CODE_ADD_REVIEW = 1;
+
 
     public mainActivityFragment() {
         // Required empty public constructor
     }
 
-/*    @Override
-    public void onHiddenChanged(boolean hidden) {
-        super.onHiddenChanged(hidden);
-        reviewsArrayAdapter.notifyDataSetChanged();
-    }*/
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (resultCode){
+            case CODE_ADD_REVIEW:
+                Review review = (Review)data.getSerializableExtra("Review");
+                if(review.getReviewId() != -1) reviewsAdapter.add(review);
+                break;
+
+        }
+    }// END OF onActivityResult()
+
+    //TODO-have menu HERE  delete reviews
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.setHeaderTitle("Select Action");
+        menu.add(0,v.getId(), 0, "Delete");
+        menu.add(0,v.getId(), 0, "Share");
+        menu.add(0,v.getId(), 0, "Exit");
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+            super.onContextItemSelected(item);
+        String message = item.getTitle().toString();
+        if(message.equals("Delete"))
+            Toast.makeText(getContext(), message + " coming soon!", LENGTH_SHORT).show();
+        else if(message.equals("Share"))
+            Toast.makeText(getContext(), message + " coming soon!", LENGTH_SHORT).show();
+        else return false;
+
+        return true;
+    }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -49,44 +85,35 @@ public class mainActivityFragment extends Fragment{
         View rootView =  inflater.inflate(R.layout.fragment_main_activity, container, false);
         final ReviewSvcSQLiteImpl reviewSvcSQLite = new ReviewSvcSQLiteImpl(this.getContext()); // start SQLite database, final is used for onClick()
 
-        /**
-         * REMOVE THIS, DELETES DATABASE ON START!!!!!!!!!!!!!!!!!!!
-         */
-        reviewSvcSQLite.deleteAll();
+        //TODO-TESTING ITEMS
+        //reviewSvcSQLite.deleteAll();    //REMOVE THIS, DELETES DATABASE ON START!!!!!!!!!!!!!!!!!!!
+//        Review review = new Review();
+//        review.setReviewTitle("Test Review Title");
+//        review.setReviewParagraph("This is a test paragraph about stuff and things, blah blah blah blah blah blah blah blah blah blah ");
+//        reviewSvcSQLite.create(review); // add review to db
 
-        //TODO- Have adapter re-populate on return from detailFragment.
         reviewList = new ArrayList<>(reviewSvcSQLite.retrieveAllReviews()); //Initialize review ArrayList with SQLite database.
-//        reviewListView = (ListView) rootView.findViewById(R.id.ListView_list_of_reviews); //Init to fragMainActivity ListView
-//        reviewsArrayAdapter = new ArrayAdapter<>(rootView.getContext(), android.R.layout.simple_list_item_1, reviewList); // Create adapter. ues simple_list_item_1 -> expects string types.
-//        reviewListView.setAdapter(reviewsArrayAdapter); //Set the adapter on the ListView
+        final ListView reviewListView = (ListView) rootView.findViewById(R.id.ListView_list_of_reviews); //get listView in fragMainActivity
+        reviewsAdapter = new ReviewAdapter(rootView.getContext(), R.layout.review_list_item); //Custom Review list adapter
+        reviewListView.setAdapter(reviewsAdapter); //Set adapter on the ListView
 
-        //Testing list view items
-        final ListView reviewListV = (ListView) rootView.findViewById(R.id.ListView_list_of_reviews);
-        final ReviewAdapter reviewsAdapter = new ReviewAdapter(rootView.getContext(), R.layout.review_list_item); // custom review list adapter
-        reviewListV.setAdapter(reviewsAdapter); //Set the adapter on the ListView
+//        for(final Review r : getReviewEntries()) reviewsAdapter.add(r);   //populate list to adapter w/ test method getReviewEntries()
+        for(final Review r : reviewList) reviewsAdapter.add(r);   //populate reviewList to adapter
 
-        //TODO- Populate list with SQLite reviews
-        for(final Review review : getReviewEntries()) reviewsAdapter.add(review);   //populate list through adapter
-
-
-        //ListView onClick handler
-        reviewListV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+    //ListView onClick handler
+        reviewListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                //get the item from the list
-//                Review review = (Review) reviewListView.getItemAtPosition(i); // int i is the position
-                Review review = (Review) reviewListV.getItemAtPosition(i); // int i is the position
-
-                // Intent detail
-                Intent intent = new Intent(view.getContext(), reviewDetailActivity.class);
-                intent.putExtra("Review", review);  // put the string extra in, i.e. the "item" clicked name.
+                Review review = (Review) reviewListView.getItemAtPosition(i);   //Get i from list, i is the position
+                Intent intent = new Intent(view.getContext(), reviewDetailActivity.class);  //New intent on reviewDetailActivity
+                intent.putExtra("Review", review);  //Put Review extra in, i.e. clicked Review from listView.
                 getActivity().startActivity(intent);
             }
         });
 
 
-        // Add Review Button onClickListener
+    // Add Review Button onClickListener
         Button addReviewButton = (Button) rootView.findViewById(R.id.button_addReview);
         addReviewButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -94,12 +121,11 @@ public class mainActivityFragment extends Fragment{
                 Review review = new Review();
                 Intent intent = new Intent(view.getContext(), reviewDetailActivity.class);
                 intent.putExtra("Review", review);  // put the string extra in, i.e. the "item" clicked name.
-                getActivity().startActivity(intent);
-                //getActivity().finish(); // close this activity to be refreshed with new review
-
-
+                startActivityForResult(intent,CODE_ADD_REVIEW); // starts activity with my code of 1. Could use to check return.
             }
         });
+
+        registerForContextMenu(reviewListView);
 
         // Inflate the layout for this fragment
         return rootView;
@@ -120,7 +146,9 @@ public class mainActivityFragment extends Fragment{
         final List<Review> reviews = new ArrayList<Review>();
 
         for(int i = 1; i < 50; i++) {
-            reviews.add(new Review( i, "Title # " + i, "Paragraph # " + i));
+            reviews.add(new Review( i, "Review Title # " + i,
+                    "This review is about something and I think it is important because of stuff and things, blah blah blah blah blah blah blah" +
+                            "blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah"));
         }
 
         return reviews;

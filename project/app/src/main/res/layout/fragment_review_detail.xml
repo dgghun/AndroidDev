@@ -59,12 +59,13 @@
         android:layout_marginRight="20dp"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="10dp"
-        android:layout_above="@+id/button_saveReview" />
+        android:layout_above="@+id/button_saveReview"
+        />
 
     <EditText
         style="@style/MyStyle_subHeader"
         android:hint="@string/review_title"
-        android:id="@+id/textView_reviewTitle"
+        android:id="@+id/reviewTitle_editText"
         android:background="@android:color/transparent"
         android:layout_toRightOf="@+id/imageView_happyFace"
         android:layout_alignTop="@+id/imageView_happyFace"

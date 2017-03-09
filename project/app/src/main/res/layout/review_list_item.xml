@@ -9,8 +9,8 @@
     <!-- Icon next to title/subtitle-->
     <ImageView
         android:id="@+id/review_icon"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         android:scaleType="fitXY"
         android:adjustViewBounds="true"
         android:layout_alignParentTop="true"
@@ -28,6 +28,7 @@
         android:textSize="14sp"
         android:textStyle="bold"
         />
+    <!-- maxLines/Length limit line size. ellipsize adds"..." to cut off lines-->
     <TextView
         android:id="@+id/review_subtitle"
         android:layout_width="wrap_content"
@@ -35,6 +36,9 @@
         android:layout_alignLeft="@id/review_title"
         android:layout_below="@id/review_title"
         android:textSize="12sp"
+        android:maxLines="2"
+        android:maxLength="200"
+        android:ellipsize="end"
         />
 
 </RelativeLayout>
