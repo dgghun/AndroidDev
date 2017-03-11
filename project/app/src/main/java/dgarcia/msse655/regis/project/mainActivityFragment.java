@@ -49,15 +49,14 @@ public class mainActivityFragment extends Fragment{
         switch (resultCode){
             case CODE_ADD_REVIEW:
                 Review review = (Review)data.getSerializableExtra("Review");
-                if(review.getReviewId() != -1) reviewsAdapter.add(review);
-                else Toast.makeText(getContext(), "Error: Add to SQLite DB", Toast.LENGTH_SHORT).show();
+                if(review.getReviewId() != -1) reviewsAdapter.add(review);  //review was save successfully, add to view
                 break;
 
         }
     }// END OF onActivityResult()
 
-    //Handles Context Menu for long press
-    @Override
+
+    @Override   //Setup Context Menu for long press
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.setHeaderTitle("Select Action");
@@ -66,25 +65,22 @@ public class mainActivityFragment extends Fragment{
         menu.add(0,v.getId(), 0, "Exit");
     }
 
-    @Override
+    @Override   //Handles Context Menu for long press
     public boolean onContextItemSelected(MenuItem item) {
         super.onContextItemSelected(item);
         String message = item.getTitle().toString();
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
-
-
         if(message.equals("Delete")){   //delete review from adapter & db
-
-            reviewList = reviewSvcSQLite.retrieveAllReviews();
-            Toast.makeText(getContext(), "DB count before: " + reviewList.size(), Toast.LENGTH_SHORT).show();
-
-            reviewSvcSQLite.delete(reviewsAdapter.getItem(info.position));
-            reviewsAdapter.remove(reviewsAdapter.getItem(info.position));
-
-            reviewList = reviewSvcSQLite.retrieveAllReviews();
-            Toast.makeText(getContext(), "DB count after: " + reviewList.size(), Toast.LENGTH_SHORT).show();
-            Toast.makeText(getContext(), message, LENGTH_SHORT).show();
+            int rowsBefore, rowsAfter;
+            reviewList = reviewSvcSQLite.retrieveAllReviews();              //Get reviews in db
+            rowsBefore = reviewList.size();                                 //Get row count before delete
+            reviewSvcSQLite.delete(reviewsAdapter.getItem(info.position));  //Delete review from db
+            reviewsAdapter.remove(reviewsAdapter.getItem(info.position));   //Remove from AdapterListView
+            reviewList = reviewSvcSQLite.retrieveAllReviews();              //Get new row count
+            rowsAfter = reviewList.size();
+            if(rowsAfter < rowsBefore) Toast.makeText(getContext(), "Review Deleted", Toast.LENGTH_SHORT).show();
+            else Toast.makeText(getContext(), "Error deleting review.", LENGTH_SHORT).show();
         }
         else if(message.equals("Share"))
             Toast.makeText(getContext(), message + " coming soon!", LENGTH_SHORT).show();

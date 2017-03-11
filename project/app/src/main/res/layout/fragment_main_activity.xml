@@ -10,14 +10,18 @@
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
-        style="@style/MyStyle_header_center"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
         android:text="@string/TV_reviewsHeader"
+        android:textSize="30sp"
+        android:gravity="center"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:id="@+id/textView3" />
+        android:id="@+id/textView_mainHeader" />
 
     <ListView
         android:id="@+id/ListView_list_of_reviews"
@@ -26,7 +30,7 @@
         android:layout_above="@+id/button_addReview"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/textView3"/>
+        android:layout_below="@+id/textView_mainHeader"/>
 
     <Button
         android:id="@+id/button_addReview"
