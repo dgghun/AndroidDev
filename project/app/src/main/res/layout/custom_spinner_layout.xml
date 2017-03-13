@@ -6,10 +6,22 @@
     >
 
     <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:id="@+id/customSpinner_imageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:padding="5dp"
         android:src="@drawable/default_image1" />
 
 </LinearLayout>
+
+
+
+<!-- Add this to above if you want to add text next to Images
+<TextView
+android:id="@+id/textView"
+android:layout_width="fill_parent"
+android:layout_height="wrap_content"
+android:layout_gravity="center"
+android:padding="@dimen/activity_horizontal_margin"
+android:text="Demo"
+android:textColor="#000" />-->

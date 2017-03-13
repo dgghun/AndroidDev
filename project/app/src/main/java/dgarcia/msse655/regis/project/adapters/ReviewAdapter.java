@@ -1,4 +1,4 @@
-package dgarcia.msse655.regis.project;
+package dgarcia.msse655.regis.project.adapters;
 
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import dgarcia.msse655.regis.project.R;
 import dgarcia.msse655.regis.project.domain.Review;
 
 /**

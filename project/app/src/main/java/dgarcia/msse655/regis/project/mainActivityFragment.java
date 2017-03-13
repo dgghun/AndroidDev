@@ -1,27 +1,27 @@
 package dgarcia.msse655.regis.project;
 
 import android.content.Intent;
-import android.icu.util.GregorianCalendar;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Button;
-import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
+import dgarcia.msse655.regis.project.adapters.ReviewAdapter;
 import dgarcia.msse655.regis.project.domain.Review;
 import dgarcia.msse655.regis.project.services.ReviewSvcSQLiteImpl;
 
@@ -104,6 +104,7 @@ public class mainActivityFragment extends Fragment{
 //        review.setReviewTitle("Test Review Title");
 //        review.setReviewParagraph("This is a test paragraph about stuff and things, blah blah blah blah blah blah blah blah blah blah ");
 //        reviewSvcSQLite.create(review); // add review to db
+
 
         reviewList = new ArrayList<>(reviewSvcSQLite.retrieveAllReviews()); //Initialize review ArrayList with SQLite database.
         final ListView reviewListView = (ListView) rootView.findViewById(R.id.ListView_list_of_reviews); //get listView in fragMainActivity
