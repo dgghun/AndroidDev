@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,6 +52,7 @@ public class reviewDetailActivityFragment extends Fragment {
         final TextView reviewHeaderTV;
         final Button saveReviewButton;
         final Spinner spinner;
+        final ImageView reviewIconImage;
         final StringBuffer iconId = new StringBuffer(" ");
 
 
@@ -90,12 +92,14 @@ public class reviewDetailActivityFragment extends Fragment {
             titleET = (EditText)rootView.findViewById(R.id.reviewTitle_editText);
             paragraphET = (EditText)rootView.findViewById(R.id.reviewParagraph_edit_text);
             reviewHeaderTV = (TextView) rootView.findViewById(R.id.reviewHeader_editText);
+            reviewIconImage = (ImageView) rootView.findViewById(R.id.imageView_reviewIcon);
             saveReviewButton = null;
 
             // Set views with Review info
             reviewHeaderTV.setText(review.getReviewDate());
             titleET.setText(review.getReviewTitle());
             paragraphET.setText(review.getReviewParagraph());
+            reviewIconImage.setImageResource(review.getReviewImageID());
         }
 
         //If adding a Review, activate SaveButton listener
