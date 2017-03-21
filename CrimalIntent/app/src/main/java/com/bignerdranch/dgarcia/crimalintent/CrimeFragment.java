@@ -1,5 +1,7 @@
 package com.bignerdranch.dgarcia.crimalintent;
 
+import android.icu.text.DateFormat;
+import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,7 +18,7 @@ import android.widget.TextView;
 
 import com.bignerdranch.dgarcia.crimalintent.domain.Crime;
 
-//TODO - On Page 158
+//TODO - On Page 185
 public class CrimeFragment extends Fragment {
     private Crime mCrime;
     private EditText mTitleField;
@@ -53,8 +55,9 @@ public class CrimeFragment extends Fragment {
         });
 
         //Setup Date Button
+        android.text.format.DateFormat dateFormat = new android.text.format.DateFormat();
         mDateButton = (Button) view.findViewById(R.id.crime_date);
-        mDateButton.setText(mCrime.getmDate().toString());
+        mDateButton.setText(dateFormat.format("MMMM dd yyyy - hh:mm a", mCrime.getmDate()));
         mDateButton.setEnabled(false);
 
         //Setup CheckBox
