@@ -9,24 +9,35 @@ import java.util.UUID;
 public class TestObject {
 
     private int id;
-    private Date mDate;
-    private static int count = 1;
+    private String Date;
 
     public TestObject(){
-        id = count;
-        mDate = new Date();
-        count++;
+
     }
+
+
 
     public int getId() {
         return id;
     }
 
-    public Date getmDate() {
-        return mDate;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public static int getCount() {
-        return count;
+    public String getDate() {
+        return Date;
+    }
+
+    public void setDate(String date) {
+        Date = date;
+    }
+
+    @Override
+    public String toString() {
+        return "TestObject{" +
+                "id=" + id +
+                ", mDate=" + Date +
+                '}';
     }
 }
