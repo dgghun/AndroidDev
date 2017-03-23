@@ -3,9 +3,12 @@ package com.dgarcia.project_firebase;
 
 import android.text.format.DateFormat;
 
+import com.google.firebase.database.IgnoreExtraProperties;
+
 import java.util.Date;
 import java.util.UUID;
 
+@IgnoreExtraProperties
 public class TestObject {
 
     private int id;
@@ -15,7 +18,10 @@ public class TestObject {
 
     }
 
-
+    public TestObject(int id, String date){
+        this.id = id;
+        this.Date = date;
+    }
 
     public int getId() {
         return id;

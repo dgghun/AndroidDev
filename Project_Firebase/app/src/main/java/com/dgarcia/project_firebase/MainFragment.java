@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -20,6 +21,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.auth.*;
 
+import org.json.JSONArray;
+
 import java.util.Date;
 
 public class MainFragment extends Fragment{
@@ -27,12 +30,15 @@ public class MainFragment extends Fragment{
     private Button mPostButton;
     private TextView mOutputWindow;
     private TestObject testObject;
-    private DatabaseReference fireBase;
+    private DatabaseReference fireBaseRef;
+    private ValueEventListener mPostListener;
+    private ChildEventListener mChildListener;
     private static int count = 0;
+    private View view;
+    private final String ROOT = "TestObjects";
 
-    final String dfString = "MMMM dd yyyy - hh:mm:ss a";  // date format string
+    final String dfString = "MM/dd/yy  hh:mm:ss a";  // date format string
     final android.text.format.DateFormat dateFormat = new DateFormat();
-    final int ERROR = 0, POSTED = 1, ADDED = 2;
 
     @Override
     public void onCreate(Bundle savedInstance){
@@ -42,14 +48,13 @@ public class MainFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances){
 
-        FirebaseAuth mAuth;
-        mAuth = FirebaseAuth.getInstance();
+        //Temp login for Firebase
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         mAuth.signInWithEmailAndPassword("dgghun@gmail.com", "123456");
 
-        final View view = inflater.inflate(R.layout.fragment_main, container, false);
-        fireBase = FirebaseDatabase.getInstance().getReference(); //get firebase handle
+        view = inflater.inflate(R.layout.fragment_main, container, false);
+        fireBaseRef = FirebaseDatabase.getInstance().getReference(ROOT); //get firebase handle
         mOutputWindow = (TextView) view.findViewById(R.id.TV_post_output_window); //handle on OutputWindow TV
-
 
         //Set up POST button
         mPostButton = (Button)view.findViewById(R.id.button_POST);
@@ -57,58 +62,101 @@ public class MainFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 count++;
-                testObject = new TestObject();
-                testObject.setId(count);
-                testObject.setDate(dateFormat.format(dfString, new Date()).toString());
-                fireBase.child("TestObject").child(Integer.toString(testObject.getId())).setValue(testObject); //Add Object
-                outputWindow(testObject, view, POSTED); //set OutPut window notification that we are posting to firebase
+                testObject = new TestObject(count, dateFormat.format(dfString, new Date()).toString()); //Create new object
+
+                fireBaseRef.child("Object " + Integer.toString(testObject.getId())).setValue(testObject); //Add Object
+
+                mOutputWindow.append("\n" + " -> Posting (ID:" + testObject.getId() + "-" + testObject.getDate() + ")");
+                scrollDown(mOutputWindow, view);
             }// END OF onClick()
         }); // END OF setonClickListener()
 
 
-        //TODO-Get data from firebase
-        //Firebase POST listener setup/implementation
-        ValueEventListener postListener = fireBase.addValueEventListener( new ValueEventListener() {
+        return view;
+    } // END OF onCreate()
+
+
+    @Override
+    public void onStart(){
+        super.onStart();
+
+        //Add value event listener
+
+        ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                TestObject dbObject = dataSnapshot.getValue(TestObject.class);  // Get object from firebase
+                Object testObject =  dataSnapshot.child(dataSnapshot.getKey()).getValue();
+                try {
+                    mOutputWindow.append("\n <- onDataChange (" + testObject + ")\n");
+                    scrollDown(mOutputWindow, view);
+                }catch (Exception e){
+                    Toast.makeText(view.getContext(), e.toString(), Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("ERROR", "loadPost:onCancelled", databaseError.toException());
+                Toast.makeText(view.getContext(), "Failed to load post.", Toast.LENGTH_SHORT).show();
+            }
+        };
 
-
-                if(dbObject != null){
-                    outputWindow(dbObject, view, ADDED);
-                    Log.e("FIREBASE", dataSnapshot.getValue(TestObject.class).toString());
+        ChildEventListener childListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                TestObject testObject = dataSnapshot.getValue(TestObject.class);
+                try {
+                    mOutputWindow.append("\n <- onChildAdded (ID:" + testObject.getId() + "-" + testObject.getDate() + ")\n");
+                    scrollDown(mOutputWindow, view);
+                }catch (Exception e){
+                    Toast.makeText(view.getContext(), e.toString(), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-                mOutputWindow.append("\n ERROR: " + databaseError.toException().toString() + "\n" );
-                scrollDown(mOutputWindow, view);
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                TestObject testObject = dataSnapshot.getValue(TestObject.class);
+                try {
+                    mOutputWindow.append("\n <- onChildChanged (ID:" + testObject.getId() + "-" + testObject.getDate() + ")\n");
+                    scrollDown(mOutputWindow, view);
+                }catch (Exception e){
+                    Toast.makeText(view.getContext(), e.toString(), Toast.LENGTH_SHORT).show();
+                }
             }
-        });
 
-        return view;
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+
+//        fireBaseRef.addValueEventListener(postListener);
+        fireBaseRef.addChildEventListener(childListener);
+
+
+        mChildListener = childListener;
+        mPostListener = postListener;
+    } //END OF onStart()
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        if(mPostListener != null) {
+            fireBaseRef.removeEventListener(mPostListener);
+        if(mChildListener != null)
+            fireBaseRef.removeEventListener(mChildListener);
+        }
     }
 
-    public void outputWindow(TestObject testObject, View view, int outPutType){
-        String currentText  = mOutputWindow.getText().toString();
-        int objectId = -1;
-        String objectDate = "NULL";
-        String postedStr = "POST ID: ";
-        String addedStr = "ADDED ID: ";
-        String message = "";
-
-        try {
-            objectDate = testObject.getDate();
-            objectId = testObject.getId();
-        }catch (Exception e){}
-
-        if(outPutType == POSTED) message = postedStr;
-        else if (outPutType == ADDED) message = addedStr;
-
-        mOutputWindow.setText(currentText + message + objectId + " Date: " + objectDate + "\n");
-        scrollDown(mOutputWindow, view);
-    }
 
 
 
@@ -120,5 +168,10 @@ public class MainFragment extends Fragment{
                 scrollView.smoothScrollTo(0, mOutputWindow.getBottom());
             }
         });
-    }
+    } //END OF scrollDown()
+
+
 }
+
+
+

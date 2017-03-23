@@ -27,9 +27,10 @@
         >
         <TextView android:id="@+id/TV_post_output_window"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:background="@android:color/background_light"
             android:hint="@string/output_window_label"
+            android:scrollbars="vertical"
             />
     </ScrollView>
 
