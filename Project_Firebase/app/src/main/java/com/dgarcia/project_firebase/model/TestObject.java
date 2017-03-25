@@ -1,14 +1,15 @@
-package com.dgarcia.project_firebase;
+package com.dgarcia.project_firebase.model;
 
 
 import android.text.format.DateFormat;
 
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.Date;
 import java.util.UUID;
 
-@IgnoreExtraProperties
+@IgnoreExtraProperties // <-- Used for firebase
 public class TestObject {
 
     private int id;

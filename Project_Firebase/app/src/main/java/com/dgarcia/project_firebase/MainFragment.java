@@ -13,6 +13,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dgarcia.project_firebase.model.TestObject;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -20,8 +21,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.auth.*;
-
-import org.json.JSONArray;
 
 import java.util.Date;
 
@@ -31,11 +30,14 @@ public class MainFragment extends Fragment{
     private TextView mOutputWindow;
     private TestObject testObject;
     private DatabaseReference fireBaseRef;
+    private DatabaseReference connectedRef;
+    private ValueEventListener mConnectedListener;
     private ValueEventListener mPostListener;
     private ChildEventListener mChildListener;
     private static int count = 0;
     private View view;
     private final String ROOT = "TestObjects";
+
 
     final String dfString = "MM/dd/yy  hh:mm:ss a";  // date format string
     final android.text.format.DateFormat dateFormat = new DateFormat();
@@ -50,10 +52,11 @@ public class MainFragment extends Fragment{
 
         //Temp login for Firebase
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        mAuth.signInWithEmailAndPassword("dgghun@gmail.com", "123456");
+        mAuth.signInWithEmailAndPassword("testObject@testObject.com", "testObject123456");
 
         view = inflater.inflate(R.layout.fragment_main, container, false);
         fireBaseRef = FirebaseDatabase.getInstance().getReference(ROOT); //get firebase handle
+        fireBaseRef.getRef().removeValue(); //Clear data base
         mOutputWindow = (TextView) view.findViewById(R.id.TV_post_output_window); //handle on OutputWindow TV
 
         //Set up POST button
@@ -63,11 +66,10 @@ public class MainFragment extends Fragment{
             public void onClick(View v) {
                 count++;
                 testObject = new TestObject(count, dateFormat.format(dfString, new Date()).toString()); //Create new object
-
                 fireBaseRef.child("Object " + Integer.toString(testObject.getId())).setValue(testObject); //Add Object
-
                 mOutputWindow.append("\n" + " -> Posting (ID:" + testObject.getId() + "-" + testObject.getDate() + ")");
                 scrollDown(mOutputWindow, view);
+
             }// END OF onClick()
         }); // END OF setonClickListener()
 
@@ -80,15 +82,39 @@ public class MainFragment extends Fragment{
     public void onStart(){
         super.onStart();
 
-        //Add value event listener
+        //Add connected listener
+        connectedRef = FirebaseDatabase.getInstance().getReference(".info/connected");
+        ValueEventListener connectedListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean connected = dataSnapshot.getValue(Boolean.class);
+                if(connected){
+                    Toast.makeText(view.getContext(), "Connected to Firebase", Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(view.getContext(), "Disconnected from Firebase", Toast.LENGTH_SHORT).show();
+                }
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+
+
+        //Add value event listener
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Object testObject =  dataSnapshot.child(dataSnapshot.getKey()).getValue();
+
                 try {
-                    mOutputWindow.append("\n <- onDataChange (" + testObject + ")\n");
-                    scrollDown(mOutputWindow, view);
+                    for(DataSnapshot dbObject : dataSnapshot.getChildren()){
+
+                        mOutputWindow.append(" <-------onDataChange (Name: " + dbObject.getKey() + ")");
+                        mOutputWindow.append(" (ID:" + dbObject.getValue(TestObject.class).getId() + ")");
+                        mOutputWindow.append(" (Date:" + dbObject.getValue(TestObject.class).getDate() + ")" + "\n");
+                        scrollDown(mOutputWindow, view);
+                    }
                 }catch (Exception e){
                     Toast.makeText(view.getContext(), e.toString(), Toast.LENGTH_SHORT).show();
                 }
@@ -98,8 +124,10 @@ public class MainFragment extends Fragment{
                 Log.e("ERROR", "loadPost:onCancelled", databaseError.toException());
                 Toast.makeText(view.getContext(), "Failed to load post.", Toast.LENGTH_SHORT).show();
             }
-        };
+        }; //END OF ValueEventListener()
 
+
+        //Add child listener
         ChildEventListener childListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -137,27 +165,34 @@ public class MainFragment extends Fragment{
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        };
+        }; //END OF ChildEventListener
 
-//        fireBaseRef.addValueEventListener(postListener);
+        fireBaseRef.addValueEventListener(postListener);
         fireBaseRef.addChildEventListener(childListener);
+        connectedRef.addValueEventListener(connectedListener);
 
-
+        //Copy listeners to stop later on
         mChildListener = childListener;
         mPostListener = postListener;
+        mConnectedListener = connectedListener;
+
     } //END OF onStart()
+
 
     @Override
     public void onStop(){
         super.onStop();
-        if(mPostListener != null) {
+        if(mPostListener != null)
             fireBaseRef.removeEventListener(mPostListener);
+
         if(mChildListener != null)
             fireBaseRef.removeEventListener(mChildListener);
-        }
+
+        if(mConnectedListener != null)
+            connectedRef.removeEventListener(mConnectedListener);
+
+        fireBaseRef.getRef().removeValue(); // remove values from db
     }
-
-
 
 
     public void scrollDown(final TextView mOutputWindow, View view){
