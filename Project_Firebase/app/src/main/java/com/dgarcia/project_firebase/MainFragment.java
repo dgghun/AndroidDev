@@ -52,7 +52,7 @@ public class MainFragment extends Fragment{
 
         //Temp login for Firebase
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        mAuth.signInWithEmailAndPassword("testObject@testObject.com", "testObject123456");
+        mAuth.signInWithEmailAndPassword("dgghun@gmail.com", "david123456");
 
         view = inflater.inflate(R.layout.fragment_main, container, false);
         fireBaseRef = FirebaseDatabase.getInstance().getReference(ROOT); //get firebase handle

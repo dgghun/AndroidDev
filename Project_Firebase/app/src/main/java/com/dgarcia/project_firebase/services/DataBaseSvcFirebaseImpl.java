@@ -31,7 +31,7 @@ public class DataBaseSvcFirebaseImpl implements IDataBaseSvc {
 
         //Temp login for Firebase
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        mAuth.signInWithEmailAndPassword("testObject@testObject.com", "testObject123456");
+        mAuth.signInWithEmailAndPassword("dgghun@gmail.com", "david123456");
         mFb_dataBaseRef = FirebaseDatabase.getInstance().getReference(dbRoot); //Get firebase handle
     }
 
