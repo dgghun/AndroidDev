@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.dgarcia.project_firebase.model.TestObject;
 import com.dgarcia.project_firebase.services.DataBaseSvcFirebaseImpl;
+import com.dgarcia.project_firebase.services.HttpAsyncTask;
 
 import org.junit.Test;
 
@@ -12,7 +13,7 @@ import java.util.Date;
 
 import static org.junit.Assert.*;
 
-public class TEST_DataBaseSvcFirebaseImpl {
+public class TEST_HttpAsyncTask {
 
     @Test
     public void read_and_write_ToFirebase(){
@@ -20,14 +21,8 @@ public class TEST_DataBaseSvcFirebaseImpl {
         android.text.format.DateFormat dateFormat = new DateFormat();
         String dfString = "MM/dd/yy  hh:mm:ss a";  // date format string
 
+        HttpAsyncTask t = new HttpAsyncTask().execute("https://regis-project.firebaseio.com/");
 
-        DataBaseSvcFirebaseImpl dataBaseSvcFirebase = new DataBaseSvcFirebaseImpl("Davids Objects");
-        dataBaseSvcFirebase.startListeners();
 
-        TestObject testObject = new TestObject(1, dateFormat.format(dfString, new Date()).toString());
-        TestObject returnedObject = dataBaseSvcFirebase.create(testObject);
-        Log.e("TEST", "ReadWrite - Add (" + returnedObject + ") to database");
-
-        dataBaseSvcFirebase.stopListeners();
     }
 }
