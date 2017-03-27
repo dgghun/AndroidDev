@@ -28,9 +28,20 @@ public class HttpAsyncTask extends AsyncTask<String, Void, String> {
         super();
     }
 
+    // Runs in UI before background thread is called
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        Log.e("onPreExecute", "Started");
+        // Do something like display a progress bar
+    }
+
+
+
     @Override
     protected String doInBackground(String... params) {
 
+        Log.e("doInBackground", "Started doInBacgGround");
         String result = "";
         HttpURLConnection urlConnection = null;
 

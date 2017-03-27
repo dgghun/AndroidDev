@@ -21,8 +21,11 @@ public class TEST_HttpAsyncTask {
         android.text.format.DateFormat dateFormat = new DateFormat();
         String dfString = "MM/dd/yy  hh:mm:ss a";  // date format string
 
-        HttpAsyncTask t = new HttpAsyncTask().execute("https://regis-project.firebaseio.com/");
-
+        Log.e("STATUS", "START OF TEST");
+        //new HttpAsyncTask().execute("https://regis-project.firebaseio.com/");
+        HttpAsyncTask httpAsyncTask = new HttpAsyncTask();
+        httpAsyncTask.execute("https://regis-project.firebaseio.com/");
+        Log.e("STATUS", "END OF TEST");
 
     }
 }
