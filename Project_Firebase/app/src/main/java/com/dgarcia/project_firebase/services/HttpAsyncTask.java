@@ -10,10 +10,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -24,17 +26,14 @@ import static com.google.android.gms.internal.zzt.TAG;
 
 public class HttpAsyncTask extends AsyncTask<String, Void, String> {
 
-    public HttpAsyncTask() {
-        super();
-    }
 
     // Runs in UI before background thread is called
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-        Log.e("onPreExecute", "Started");
-        // Do something like display a progress bar
-    }
+//    @Override
+//    protected void onPreExecute() {
+//        super.onPreExecute();
+//        Log.e("onPreExecute", "Started");
+//        // Do something like display a progress bar
+//    }
 
 
 
@@ -85,7 +84,10 @@ public class HttpAsyncTask extends AsyncTask<String, Void, String> {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 Log.e(TAG, jsonObject.getString("id") + " " + "date");
                 databaseEntries[i] = jsonObject.getString("id"); //or use "date" ????
+
+                Log.e("PostExecute", "DB Entries: " + databaseEntries[i]);
             }
+
 
             //Do stuff...
 //            someAdapter = new ArrayAdapter<String>(self, R.layout.some_text_view, someObject);

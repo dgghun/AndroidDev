@@ -36,7 +36,7 @@ public class MainFragment extends Fragment{
     private ChildEventListener mChildListener;
     private static int count = 0;
     private View view;
-    private final String ROOT = "TestObjects";
+    private final String ROOT = "TestObjects", ROOT2 = "MyObjects";
 
 
     final String dfString = "MM/dd/yy  hh:mm:ss a";  // date format string
@@ -84,7 +84,7 @@ public class MainFragment extends Fragment{
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         mAuth.signInWithEmailAndPassword("dgghun@gmail.com", "david123456");
 
-        fireBaseRef = FirebaseDatabase.getInstance().getReference(ROOT); //get firebase handle
+        fireBaseRef = FirebaseDatabase.getInstance().getReference(ROOT2); //get firebase handle
         fireBaseRef.getRef().removeValue(); //Clear data base
 
         //Add connected listener
@@ -196,7 +196,7 @@ public class MainFragment extends Fragment{
         if(mConnectedListener != null)
             connectedRef.removeEventListener(mConnectedListener);
 
-        fireBaseRef.getRef().removeValue(); // remove values from db
+//        fireBaseRef.getRef().removeValue(); // remove values from db
     }
 
 
