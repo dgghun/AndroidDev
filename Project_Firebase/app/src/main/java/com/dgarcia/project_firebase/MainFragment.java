@@ -3,6 +3,9 @@ package com.dgarcia.project_firebase;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,7 +25,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.auth.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class MainFragment extends Fragment{
 
@@ -38,6 +43,9 @@ public class MainFragment extends Fragment{
     private View view;
     private final String ROOT = "TestObjects", ROOT2 = "MyObjects";
 
+    private List<String> mStringList = new ArrayList<>();
+    private RecyclerView mRecyclerView;
+    private StringAdapter mStringAdapter;
 
     final String dfString = "MM/dd/yy  hh:mm:ss a";  // date format string
     final android.text.format.DateFormat dateFormat = new DateFormat();
@@ -53,6 +61,16 @@ public class MainFragment extends Fragment{
         view = inflater.inflate(R.layout.fragment_main, container, false);
         mOutputWindow = (TextView) view.findViewById(R.id.TV_post_output_window); //handle on OutputWindow TV
 
+        //RECYCLER VIEW setup
+        mRecyclerView = (RecyclerView)view.findViewById(R.id.RecyclerView_outputWindow);
+        mStringAdapter = new StringAdapter(mStringList);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(view.getContext());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setAdapter(mStringAdapter);
+        addSomeStrings();
+
+
         //Set up POST button
         mPostButton = (Button)view.findViewById(R.id.button_POST);
         mPostButton.setOnClickListener(new View.OnClickListener() {
@@ -61,7 +79,7 @@ public class MainFragment extends Fragment{
                 count++;
                 testObject = new TestObject(count, dateFormat.format(dfString, new Date()).toString()); //Create new object
 
-                fireBaseRef.child("Object " + Integer.toString(testObject.getId())).setValue(testObject); //Add Object via Firebase Android API
+                //fireBaseRef.child("Object " + Integer.toString(testObject.getId())).setValue(testObject); //Add Object via Firebase Android API
 
                 mOutputWindow.append("\n" + " -> Posting (ID:" + testObject.getId() + "-" + testObject.getDate() + ")");
                 scrollDown(mOutputWindow, view);
@@ -76,129 +94,141 @@ public class MainFragment extends Fragment{
 
     // DON'T USE BELOW YET. Android Firebase API stuff
 
-    @Override
-    public void onStart(){
-        super.onStart();
+//    @Override
+//    public void onStart(){
+//        super.onStart();
+//
+//         //Temp login for Firebase
+//        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+//        mAuth.signInWithEmailAndPassword("dgghun@gmail.com", "david123456");
+//
+//        fireBaseRef = FirebaseDatabase.getInstance().getReference(ROOT2); //get firebase handle
+//        fireBaseRef.getRef().removeValue(); //Clear data base
+//
+//        //Add connected listener
+//        connectedRef = FirebaseDatabase.getInstance().getReference(".info/connected");
+//        ValueEventListener connectedListener = new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                boolean connected = dataSnapshot.getValue(Boolean.class);
+//                if(connected){
+//                    Toast.makeText(view.getContext(), "Connected to Firebase", Toast.LENGTH_SHORT).show();
+//                }else {
+//                    Toast.makeText(view.getContext(), "Disconnected from Firebase", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        };
+//
+//
+//        //Add value event listener
+//        ValueEventListener postListener = new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//
+//                try {
+//                    for(DataSnapshot dbObject : dataSnapshot.getChildren()){
+//
+//                        mOutputWindow.append(" <-------onDataChange (Name: " + dbObject.getKey() + ")");
+//                        mOutputWindow.append(" (ID:" + dbObject.getValue(TestObject.class).getId() + ")");
+//                        mOutputWindow.append(" (Date:" + dbObject.getValue(TestObject.class).getDate() + ")" + "\n");
+//                        scrollDown(mOutputWindow, view);
+//                    }
+//                }catch (Exception e){
+//                    Toast.makeText(view.getContext(), e.toString(), Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                Log.e("ERROR", "loadPost:onCancelled", databaseError.toException());
+//                Toast.makeText(view.getContext(), "Failed to load post.", Toast.LENGTH_SHORT).show();
+//            }
+//        }; //END OF ValueEventListener()
+//
+//
+//        //Add child listener
+//        ChildEventListener childListener = new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//                TestObject testObject = dataSnapshot.getValue(TestObject.class);
+//                try {
+//                    mOutputWindow.append("\n <- onChildAdded (ID:" + testObject.getId() + "-" + testObject.getDate() + ")\n");
+//                    scrollDown(mOutputWindow, view);
+//                }catch (Exception e){
+//                    Toast.makeText(view.getContext(), e.toString(), Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//
+//            @Override
+//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//                TestObject testObject = dataSnapshot.getValue(TestObject.class);
+//                try {
+//                    mOutputWindow.append("\n <- onChildChanged (ID:" + testObject.getId() + "-" + testObject.getDate() + ")\n");
+//                    scrollDown(mOutputWindow, view);
+//                }catch (Exception e){
+//                    Toast.makeText(view.getContext(), e.toString(), Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//
+//            @Override
+//            public void onChildRemoved(DataSnapshot dataSnapshot) {
+//
+//            }
+//
+//            @Override
+//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        }; //END OF ChildEventListener
+//
+//        fireBaseRef.addValueEventListener(postListener);
+//        fireBaseRef.addChildEventListener(childListener);
+//        connectedRef.addValueEventListener(connectedListener);
+//
+//        //Copy listeners to stop later on
+//        mChildListener = childListener;
+//        mPostListener = postListener;
+//        mConnectedListener = connectedListener;
+//
+//    } //END OF onStart()
+//
+//
+//    @Override
+//    public void onStop(){
+//        super.onStop();
+//        if(mPostListener != null)
+//            fireBaseRef.removeEventListener(mPostListener);
+//
+//        if(mChildListener != null)
+//            fireBaseRef.removeEventListener(mChildListener);
+//
+//        if(mConnectedListener != null)
+//            connectedRef.removeEventListener(mConnectedListener);
+//
+////        fireBaseRef.getRef().removeValue(); // remove values from db
+//    } // END OF onStop()
 
-         //Temp login for Firebase
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        mAuth.signInWithEmailAndPassword("dgghun@gmail.com", "david123456");
-
-        fireBaseRef = FirebaseDatabase.getInstance().getReference(ROOT2); //get firebase handle
-        fireBaseRef.getRef().removeValue(); //Clear data base
-
-        //Add connected listener
-        connectedRef = FirebaseDatabase.getInstance().getReference(".info/connected");
-        ValueEventListener connectedListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                boolean connected = dataSnapshot.getValue(Boolean.class);
-                if(connected){
-                    Toast.makeText(view.getContext(), "Connected to Firebase", Toast.LENGTH_SHORT).show();
-                }else {
-                    Toast.makeText(view.getContext(), "Disconnected from Firebase", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
+    //TODO - Finish recycler view adapter
+    //https://developer.android.com/samples/RecyclerView/index.html
+    //https://developer.android.com/training/material/lists-cards.html
 
 
-        //Add value event listener
-        ValueEventListener postListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                try {
-                    for(DataSnapshot dbObject : dataSnapshot.getChildren()){
-
-                        mOutputWindow.append(" <-------onDataChange (Name: " + dbObject.getKey() + ")");
-                        mOutputWindow.append(" (ID:" + dbObject.getValue(TestObject.class).getId() + ")");
-                        mOutputWindow.append(" (Date:" + dbObject.getValue(TestObject.class).getDate() + ")" + "\n");
-                        scrollDown(mOutputWindow, view);
-                    }
-                }catch (Exception e){
-                    Toast.makeText(view.getContext(), e.toString(), Toast.LENGTH_SHORT).show();
-                }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e("ERROR", "loadPost:onCancelled", databaseError.toException());
-                Toast.makeText(view.getContext(), "Failed to load post.", Toast.LENGTH_SHORT).show();
-            }
-        }; //END OF ValueEventListener()
-
-
-        //Add child listener
-        ChildEventListener childListener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                TestObject testObject = dataSnapshot.getValue(TestObject.class);
-                try {
-                    mOutputWindow.append("\n <- onChildAdded (ID:" + testObject.getId() + "-" + testObject.getDate() + ")\n");
-                    scrollDown(mOutputWindow, view);
-                }catch (Exception e){
-                    Toast.makeText(view.getContext(), e.toString(), Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                TestObject testObject = dataSnapshot.getValue(TestObject.class);
-                try {
-                    mOutputWindow.append("\n <- onChildChanged (ID:" + testObject.getId() + "-" + testObject.getDate() + ")\n");
-                    scrollDown(mOutputWindow, view);
-                }catch (Exception e){
-                    Toast.makeText(view.getContext(), e.toString(), Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        }; //END OF ChildEventListener
-
-        fireBaseRef.addValueEventListener(postListener);
-        fireBaseRef.addChildEventListener(childListener);
-        connectedRef.addValueEventListener(connectedListener);
-
-        //Copy listeners to stop later on
-        mChildListener = childListener;
-        mPostListener = postListener;
-        mConnectedListener = connectedListener;
-
-    } //END OF onStart()
-
-
-    @Override
-    public void onStop(){
-        super.onStop();
-        if(mPostListener != null)
-            fireBaseRef.removeEventListener(mPostListener);
-
-        if(mChildListener != null)
-            fireBaseRef.removeEventListener(mChildListener);
-
-        if(mConnectedListener != null)
-            connectedRef.removeEventListener(mConnectedListener);
-
-//        fireBaseRef.getRef().removeValue(); // remove values from db
+    private void addSomeStrings(){
+        int temp;
+        for(int i = 0; i < 20; i++){
+            mStringList.add("String # " + Integer.toString(i+1));
+        }
+        mStringAdapter.notifyDataSetChanged();
     }
-
 
     public void scrollDown(final TextView mOutputWindow, View view){
         final ScrollView scrollView = (ScrollView)view.findViewById(R.id.Scroll_post_output_window);
