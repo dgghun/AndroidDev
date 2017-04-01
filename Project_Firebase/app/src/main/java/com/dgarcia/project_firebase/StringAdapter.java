@@ -1,6 +1,7 @@
 package com.dgarcia.project_firebase;
 
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
-//EXAMPLE FROM http://www.androidhive.info/2016/01/android-working-with-recycler-view/
+// ADAPTED FROM http://www.androidhive.info/2016/01/android-working-with-recycler-view/
 public class StringAdapter extends RecyclerView.Adapter<StringAdapter.MyViewHolder>{
 
     private List<String> stringList;
@@ -36,6 +37,11 @@ public class StringAdapter extends RecyclerView.Adapter<StringAdapter.MyViewHold
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position){
         String s = stringList.get(position);
+
+        //Change text color depending on input
+        if(s.startsWith("->")) holder.mTextView.setTextColor(Color.rgb(0,255,55)); //Green
+        else if(s.startsWith("<-") )holder.mTextView.setTextColor(Color.rgb(0, 229, 255)); //blue
+        else holder.mTextView.setTextColor(Color.WHITE);
         holder.mTextView.setText(s);
     }
 

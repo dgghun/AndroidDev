@@ -3,27 +3,25 @@ package com.dgarcia.project_firebase;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.*;
+import android.support.v7.widget.DividerItemDecoration;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.dgarcia.project_firebase.model.TestObject;
 import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.auth.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,7 +30,6 @@ import java.util.List;
 public class MainFragment extends Fragment{
 
     private Button mPostButton;
-    private TextView mOutputWindow;
     private TestObject testObject;
     private DatabaseReference fireBaseRef;
     private DatabaseReference connectedRef;
@@ -42,11 +39,20 @@ public class MainFragment extends Fragment{
     private static int count = 0;
     private View view;
     private final String ROOT = "TestObjects", ROOT2 = "MyObjects";
+    private final String IN = "<-";
+    private final String OUT = "->";
 
+    //Recycler View variables
     private List<String> mStringList = new ArrayList<>();
     private RecyclerView mRecyclerView;
     private StringAdapter mStringAdapter;
 
+    //Volley variables
+    RequestQueue queue;
+    StringRequest stringRequest;
+
+
+    //Date format variables
     final String dfString = "MM/dd/yy  hh:mm:ss a";  // date format string
     final android.text.format.DateFormat dateFormat = new DateFormat();
 
@@ -59,16 +65,19 @@ public class MainFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances){
 
         view = inflater.inflate(R.layout.fragment_main, container, false);
-        mOutputWindow = (TextView) view.findViewById(R.id.TV_post_output_window); //handle on OutputWindow TV
 
         //RECYCLER VIEW setup
-        mRecyclerView = (RecyclerView)view.findViewById(R.id.RecyclerView_outputWindow);
-        mStringAdapter = new StringAdapter(mStringList);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(view.getContext());
+        mRecyclerView = (RecyclerView)view.findViewById(R.id.RecyclerView_outputWindow);    //Get handle on recycler view
+        mStringAdapter = new StringAdapter(mStringList);    //add string list to custom adapter
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(view.getContext()); // get new layout manager
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mStringAdapter);
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL));
+        startRecyclerListener();
+        setUpVolleyRequestQueue();
         addSomeStrings();
+
 
 
         //Set up POST button
@@ -81,8 +90,6 @@ public class MainFragment extends Fragment{
 
                 //fireBaseRef.child("Object " + Integer.toString(testObject.getId())).setValue(testObject); //Add Object via Firebase Android API
 
-                mOutputWindow.append("\n" + " -> Posting (ID:" + testObject.getId() + "-" + testObject.getDate() + ")");
-                scrollDown(mOutputWindow, view);
 
             }// END OF onClick()
         }); // END OF setonClickListener()
@@ -92,7 +99,7 @@ public class MainFragment extends Fragment{
     } // END OF onCreate()
 
 
-    // DON'T USE BELOW YET. Android Firebase API stuff
+    /*TODO - DON'T USE BELOW YET. Android Firebase API stuff*/
 
 //    @Override
 //    public void onStart(){
@@ -222,23 +229,55 @@ public class MainFragment extends Fragment{
     //https://developer.android.com/training/material/lists-cards.html
 
 
+    private void startRecyclerListener(){
+
+        mRecyclerView.addOnItemTouchListener(
+                new RecyclerTouchListener(view.getContext(), new RecyclerTouchListener.OnItemClickListener() {
+                    @Override public void onItemClick(View view, int position) {
+                        String s = mStringList.get(position);
+                        Toast.makeText(view.getContext(),"Clicked " + s, Toast.LENGTH_SHORT).show();
+                    }
+                })
+        );
+    }
+
     private void addSomeStrings(){
         int temp;
-        for(int i = 0; i < 20; i++){
-            mStringList.add("String # " + Integer.toString(i+1));
-        }
+        String str;
+        mStringList.add("Staring up");
+//        for(int i = 0; i < 20; i++){
+//            if(i % 2 == 0) str = IN;
+//            else str = OUT;
+//            mStringList.add(str + " String # " + Integer.toString(i+1));
+//        }
+        mStringList.add("Ready");
         mStringAdapter.notifyDataSetChanged();
     }
 
-    public void scrollDown(final TextView mOutputWindow, View view){
-        final ScrollView scrollView = (ScrollView)view.findViewById(R.id.Scroll_post_output_window);
-        scrollView.post(new Runnable() {
+    private void setUpVolleyRequestQueue(){
+        //Instantiate requestQueue
+        final String urlFB = "https://regis-project.firebaseio.com/";
+        queue = Volley.newRequestQueue(view.getContext());
+
+        // Request a string response from url
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, urlFB,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Display the first xx characters of the response string.
+                        mStringList.add(response.substring(0, 700));
+                        mStringAdapter.notifyDataSetChanged();
+                    }
+                }, new Response.ErrorListener() {
             @Override
-            public void run() {
-                scrollView.smoothScrollTo(0, mOutputWindow.getBottom());
+            public void onErrorResponse(VolleyError error) {
+                mStringList.add("ERROR" + error.toString().substring(0, 30));
+                mStringAdapter.notifyDataSetChanged();
             }
         });
-    } //END OF scrollDown()
+        // add request to the request queue
+        queue.add(stringRequest);
+    }
 
 
 }// END OF MainFragment()

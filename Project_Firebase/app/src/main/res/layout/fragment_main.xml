@@ -18,24 +18,7 @@
         android:layout_marginTop="16dp"
         android:backgroundTint="@android:color/holo_blue_bright"
         />
-    <!--ScrollView below should match_parent for height-->
-    <ScrollView android:id="@+id/Scroll_post_output_window"
-        android:layout_width="fill_parent"
-        android:layout_height="36dp"
-        android:scrollbars="vertical"
-        android:fillViewport="true"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="16dp"
-        >
-        <TextView android:id="@+id/TV_post_output_window"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/background_light"
-            android:hint="@string/output_window_label"
-            android:scrollbars="vertical"
-            />
-    </ScrollView>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/RecyclerView_outputWindow"
         android:scrollbars="vertical"
