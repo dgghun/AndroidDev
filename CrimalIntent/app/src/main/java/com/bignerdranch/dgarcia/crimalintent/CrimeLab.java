@@ -26,19 +26,19 @@ public class CrimeLab {
         //fills array with crimes
         for(int i = 0; i < 100; i++){
             Crime crime = new Crime();
-            crime.setmTitle("Crime # " + i);
-            crime.setmSolved(i % 2 == 0);   //every other one true/false
+            crime.setTitle("Crime # " + i);
+            crime.setSolved(i % 2 == 0);   //every other one true/false
             mCrimes.add(crime);
         }
     }
 
-    public List<Crime> getmCrimes(){
+    public List<Crime> getCrimes(){
         return mCrimes;
     }
 
     public Crime getCrime(UUID id){
         for(Crime crime : mCrimes){
-            if(crime.getmId().equals(id)) return crime;
+            if(crime.getId().equals(id)) return crime;
         }
         return null;
     }
